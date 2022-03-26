@@ -10,3 +10,7 @@ WTH this is:
 8- Results (game)
 9- Points awarded (main/game)
 Loop to 3 until exit signal
+
+Object orientation:
+- webscrape info
+- player info

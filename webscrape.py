@@ -8,31 +8,25 @@ class Scraper:
         self.game_url = 'https://plaintextsports.com/nba/' + date + '/' + teams
         self.teams = teams.upper()
         #Gets page from url, gets the text, then makes a Beautiful soup object with it for parsing
-        self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text)
+        self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text, features="lxml")
         
         #Gets the elements from the page, then make self.team1site and team2site from them
         
         elems = self.game_site.select('.text-fg')
-        urls = list(set([x[href] for x in elems]))
+        # HACK this was throwing an error, god help me this doesn't break anything
+        #urls = list(set([x[href] for x in elems]))
 
+        # Initialize player lists
+        # t1_players, t2_players
 
         self.team1_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[0].a['href']
         self.team2_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[-1].a['href']
+        self.get_player_array()
+        
+        self.plays = self.get_plays()
         #REMEMBER TO RETURN STRINGS
-        create_player_impact_list(self)
+        #self.create_player_impact_list(self)
     def get_plays(self):
-        # self.plays = []
-
-        # not_done = True
-        # for quarter in range(1, 5):
-        #     for play in range(0, 200):
-        #         curr = self.main_site.select('#play-q{}-{} + div'.format(quarter, play))
-        #         try:
-        #             lol = curr[0].getText()
-        #             print(lol)
-        #             self.plays.append(lol[:-2])
-        #         except:
-        #             continue
         plays_unformatted = self.game_site.select('.play-by-play-toggle-content .play-by-play > b.score > div')
         formatted = []
         counter = 1
@@ -47,9 +41,11 @@ class Scraper:
                 formatted.append(val.getText().split(" ")[-1])
                 counter = 1
         formatted.reverse()
-        self.plays = formatted
+        self.plays = formatted  # Has all the scoring plays, the time left in the match,
+                                # and statements of what happened in the plays
     def get_team_record(self, ):
         # calculates the team record before the game
+        
         pass
     def get_winner(self):
         
@@ -68,20 +64,25 @@ class Scraper:
         return [self.score1, self.score2]
         # [score1, score2]
     
-    # HACK: this method is NOT static, only for test
+    
     @staticmethod
-    def get_player_array():
+    def clean_player_string(player_string):
+        valid = re.compile(r"\s?[\+|\-]?[0-9]+")
+        if valid.match(player_string[len(player_string) - 2:]) is None:
+            return player_string.strip()
+        return player_string[0:len(player_string)-2].replace("+", "").replace("-", "").strip()
+    
+    def get_player_array(self):
         # [[team1 start], [team1 bench], [team2 start], [team2 bench]]
-        # HACK: this is test, pls remove
-        test_site = bs4.BeautifulSoup(requests.get("https://plaintextsports.com/nba/2022-03-25/was-det").text)
-        players = []
+        self.players = []
         
-        box_player_elems = test_site.select('.box-score-players > div')
-        for player in range(0, len(box_player_elems), 2):
-            players.append(box_player_elems[player].getText())
-        return players
-        
-
+        # TODO separate by team
+        t1_site = bs4.BeautifulSoup(requests.get(self.game_url).text, features="lxml")
+        box_player_elems = t1_site.select('.box-score-players > div')
+        for player in box_player_elems:
+            self.players.append(player.getText())
+        self.players = list(filter(lambda x: x[0:1]!=" " and x[len(x)-1:]!="S", self.players))
+        self.players = list(map(lambda x: Scraper.clean_player_string(x), self.players))
    
     def create_player_impact_list(self):
         self.player_impact_list = self.game_site.find_all(".text-gray")
@@ -104,7 +105,7 @@ class Scraper:
         return self.players[l_pos]
     
     def get_team_record(self): 
-        
+        pass
     def get_dumb_box_score_info(self):
         #this is weird and pain so we deal with it later
         # returns array of strings corr to teams
@@ -126,7 +127,7 @@ class Scraper:
     def teams_on_day(date):
         teams = []
         url = 'https://plaintextsports.com/nba/' + date
-        teams_site = bs4.BeautifulSoup(requests.get(url).text)
+        teams_site = bs4.BeautifulSoup(requests.get(url).text, features="lxml")
         for link in teams_site.select('a.text-fg.no-underline'):
             text = link.get('href')
             teams.append(text[len(text) - 7::])
@@ -134,66 +135,70 @@ class Scraper:
     
     @staticmethod
     def get_full_name(team):
-        match team:
+        match team.upper():
             case 'ATL':
-                return 'atlanta-hawks'
+                return 'Atlanta Hawks'
             case 'BOS':
-                return 'boston-celtics'
+                return 'Boston Celtics'
             case 'BKN':
-                return 'brooklyn-nets'
+                return 'Brooklyn Nets'
             case 'CHA':
-                return 'charlotte-hornets'
+                return 'Charlotte Hornets'
             case 'CHI':
-                return 'chicago-bulls'
+                return 'Chicago Bulls'
             case 'CLE':
-                return 'cleveland-cavaliers'
+                return 'Cleveland Cavaliers'
             case 'DAL':
-                return 'dallas-mavericks'
+                return 'Dallas Mavericks'
             case 'DEN':
-                return 'denver-nuggets'
+                return 'Denver Nuggets'
             case 'DET':
-                return 'detroit-pistons'
+                return 'Detroit Pistons'
             case 'GSW':
-                return 'golden-state-warriors'
+                return 'Golden State Warriors'
             case 'HOU':
-                return 'houston-rockets'
+                return 'Houston Rockets'
             case 'IND':
-                return 'indiana-pacers'
+                return 'Indiana Pacers'
             case 'LAC':
-                return 'los-angeles-clippers'
+                return 'Los Angeles Clippers'
             case 'LAL':
-                return 'los-angeles-lakers'
+                return 'Los Angeles Lakers'
             case 'MEM':
-                return 'memphis-grizzlies'
+                return 'Memphis Grizzlies'
             case 'MIA':
-                return 'miami-heat'
+                return 'Miami Heat'
             case 'MIL':
-                return 'milwaukee-bucks'
+                return 'Milwaukee Bucks'
             case 'MIN':
-                return 'minnesota-timberwolves'
+                return 'Minnesota Timberwolves'
             case 'NOP':
-                return 'new-orleans-pelicans'
+                return 'New Orleans Pelicans'
             case 'NYK':
-                return 'new-york-knicks'
+                return 'New York Knicks'
             case 'OKC':
-                return 'oklahoma-city-thunder'
+                return 'Oklahoma City Thunder'
             case 'ORL':
-                return 'orlando-magic'
+                return 'Orlando Magic'
             case 'PHI':
-                return 'philadelphia-76ers'
+                return 'Philadelphia 76ers'
             case 'PHX':
-                return 'phoenix-suns'
+                return 'Phoenix Suns'
             case 'POR':
-                return 'portland-trail-blazers'
+                return 'Portland Trail Blazers'
             case 'SAC':
-                return 'sacramento-kings'
+                return 'Sacramento Kings'
             case 'SAS':
-                return 'san-antonio-spurs'
+                return 'San Antonio Spurs'
             case 'TOR':
-                return 'toronto-raptors'
+                return 'Toronto Raptors'
             case 'UTA':
-                return 'utah-jazz'
+                return 'Utah Jazz'
             case 'WAS':
-                return 'washington-wizards'
+                return 'Washington Wizards'
             case _:
                 return '!!invalid!!'
+    
+    def get_team_arr_from_teams(self):
+        return [Scraper.get_full_name(self.teams[:3]), Scraper.get_full_name(self.teams[len(self.teams) - 3:])]
+

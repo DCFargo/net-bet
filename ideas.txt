@@ -1,7 +1,7 @@
 WTH this is:
 
-1- Make players (game)
-2- Select game (main/game)
+x1- Make players (game)
+x2- Select game (main/game)
 3- Webscrape all info (webscrape)
 4- Show users hint info (main/game)
 5- Player bets (game)
@@ -14,3 +14,8 @@ Loop to 3 until exit signal
 Object orientation:
 - webscrape info
 - player info
+
+Dependencies
+- requests
+- bs4
+- curses

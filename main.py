@@ -73,10 +73,15 @@ scraper = webscrape.Scraper(game_date, team_str)
 
 # Show users hint info
 
-
+print("\n" + "-" * 80)
+print(scraper.get_team_record())
 
 # Player bets
 
+for i in range (len(players)):
+  print("Player " + str(i + 1) + " balance: " + players[i])
+  
+  
 
 # Play out game
 def main(stdscr):

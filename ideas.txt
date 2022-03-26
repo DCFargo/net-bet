@@ -2,10 +2,10 @@ WTH this is:
 
 x1- Make players (game)
 x2- Select game (main/game)
-3- Webscrape all info (webscrape)
+x3- Webscrape all info (webscrape)
 4- Show users hint info (main/game)
-5- Player bets (game)
-6- Initialize UI (curses)
+x5- Player bets (game)
+x6- Initialize UI (curses)
 7- Play out game (curses/game)
 8- Results (game)
 9- Points awarded (main/game)

@@ -23,7 +23,7 @@ class Scraper:
         self.team2_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[-1].a['href']
         self.get_player_array()
         
-        self.plays = self.get_plays()
+        self.get_plays()
         #REMEMBER TO RETURN STRINGS
         #self.create_player_impact_list(self)
     def get_plays(self):

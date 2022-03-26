@@ -15,9 +15,18 @@ while True:
   except ValueError:
     print("Please enter a number.")
     
+while True:
+  try:
+    starting_money = int('Please enter a whole number amount of money to start with: ')
+    if starting_money > 0:
+      break
+    else:
+      print("Invalid input.")
+  except:
+    print("Invalid input.")
 players = []
 for i in range(num_players):
-  players.append(game.Player(1000))  
+  players.append(game.Player(starting_money))  
 
 # Select date
 print("\n")
@@ -209,8 +218,7 @@ for i in range (len(players)):
       except ValueError:
         bet_amount = input("Please enter a valid number: ")
         
-
-  players[i].bet = [bet_category, bet_prediction, bet_amount] 
+  players[i].bets.append([bet_category, bet_prediction, bet_amount])
   
 # Play out game
 #def main(stdscr):
@@ -219,6 +227,8 @@ for i in range (len(players)):
 
 # HACK: text print version for debug
 
+for play in scraper.plays:
+  print(play)
 
 # Calc results
 

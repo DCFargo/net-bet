@@ -1,5 +1,5 @@
 import game
-import ncurses_usage
+import curses_usage
 import webscrape
 
 print("Hello, world!")

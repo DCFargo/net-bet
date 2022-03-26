@@ -10,6 +10,7 @@ class Scraper:
         #Gets page from url, gets the text, then makes a Beautiful soup object with it for parsing
         self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text, features="lxml")
         
+
         #Gets the elements from the page, then make self.team1site and team2site from them
         
         elems = self.game_site.select('.text-fg')
@@ -21,6 +22,11 @@ class Scraper:
 
         self.team1_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[0].a['href']
         self.team2_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[-1].a['href']
+        self.team1_site = bs4.BeautifulSoup(requests.get(self.team1_url).text, features='lxml')
+        #team1_site = bs4.BeautifulSoup(requests.get(team1_url).text, features='lxml')
+        #team1_url = "https://plaintextsports.com" + game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[0].a['href']
+
+        self.team2_site = bs4.BeautifulSoup(requests.get(self.team2_url).text, features='lxml')
         self.get_player_array()
         
         self.get_plays()
@@ -43,10 +49,6 @@ class Scraper:
         formatted.reverse()
         self.plays = formatted  # Has all the scoring plays, the time left in the match,
                                 # and statements of what happened in the plays
-    def get_team_record(self, ):
-        # calculates the team record before the game
-        
-        pass
     def get_winner(self):
         
         if self.score1 > self.score2:
@@ -56,12 +58,13 @@ class Scraper:
         return "TIE"
             
     def get_final_score(self):
-        self.scores = str(self.game_site.select(".container.text-center"))
-        self.scores = str(self.game_site.select(".container.text-center"))
-        self.scores = self.scores.splitlines()
-        self.score1 = int(self.scores[2][len(self.scores[2])-9: len(self.scores[2])-6])
-        self.score2 = int(self.scores[3][len(self.scores[3])-7: len(self.scores[3])-4])
-        return [self.score1, self.score2]
+        #
+        final_score = self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > span')[1].parent
+        final_score.span.extract()
+        final_score = final_score.getText().split(' - ')
+        self.score1 = final_score[0]
+        self.score2 = final_score[1]
+        return final_score
         # [score1, score2]
     
     
@@ -105,7 +108,37 @@ class Scraper:
         return self.players[l_pos]
     
     def get_team_record(self): 
-        pass
+        def is_our_game(tag: bs4.Tag):
+            if tag.has_attr('href'):
+                return "https://plaintextsports.com" + tag['href'] == self.game_url
+            return False
+
+        self.teams_record: list[tuple[int, int]] = []
+
+        attempt = self.team1_site.find(is_our_game)
+        dub_or_l = attempt.span.getText() # "W" or "L"
+        attempt.span.extract()
+        win_loss_record: list[int] = attempt.next_sibling.strip().split('-')
+        win_loss_record = [int(win_loss) for win_loss in win_loss_record]
+        if (dub_or_l.upper() == 'W'):
+            win_loss_record[0] -= 1
+        else:
+            win_loss_record[1] -= 1
+        self.teams_record.append(win_loss_record)
+        attempt2 = self.team2_site.find(is_our_game)
+        dub_or_l = attempt2.span.getText()
+        attempt2.span.extract()
+        win_loss_record: list[int, int] = attempt.next_sibling.strip().split('-')
+        win_loss_record = [int(win_loss) for win_loss in win_loss_record]
+        if (dub_or_l.upper() == 'W'):
+            win_loss_record[0] -= 1
+        else:
+            win_loss_record[1] -= 1
+        self.teams_record.append(win_loss_record)
+        
+
+
+
     def get_dumb_box_score_info(self):
         #this is weird and pain so we deal with it later
         # returns array of strings corr to teams

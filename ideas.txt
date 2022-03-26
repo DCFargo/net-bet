@@ -7,8 +7,8 @@ x3- Webscrape all info (webscrape)
 x5- Player bets (game)
 x6- Initialize UI (curses)
 7- Play out game (curses/game)
-8- Results (game)
-9- Points awarded (main/game)
+x8- Results (game)
+.9- Points awarded (main/game)
 Loop to 3 until exit signal
 
 Object orientation:
@@ -19,3 +19,5 @@ Dependencies
 - requests
 - bs4
 - curses
+
+TODO: Remove features=lxml

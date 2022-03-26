@@ -1,3 +1,12 @@
 WTH this is:
 
-
+1- Initialize UI (curses)
+2- Make players (game)
+3- Select game (main/game)
+4- Webscrape all info (webscrape)
+5- Show users hint info (main/game)
+6- Player bets (game)
+7- Play out game (curses/game)
+8- Results (game)
+9- Points awarded (main/game)
+Loop to 3 until exit signal

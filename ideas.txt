@@ -21,3 +21,13 @@ Dependencies
 - curses
 
 TODO: Remove features=lxml
+
+THE DEVPOST QUESTIONS:
+A short written passage about your project, the inspirations for your project, how your project was built, its features, challenges you ran into, and future plans for your project (max of 100 words each). They can also be bullet points.
+
+Our Project: It's a mini sports betting game that takes past games, let's you place bets (essentially just points) on a variety of topics and then animates the game out
+Inspirations: We saw the sports theme and talked about animating a sports game. The idea was then brought up (after one of us saw cards or something) to make it an interactive(ihs) game with betting, and then INSERT NAME HERE was born
+
+Challeneges: The website that we decided to webscrape is written to almost intentionally be hard to web scrape which makes no sense given it's a plain text web site. So the web scraping took forever to work out
+
+Future Plans: Making this work for every sport and making it work on past seasons and possibly future seasons

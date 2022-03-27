@@ -27,7 +27,11 @@ The website that we decided to web-scrape is written to almost intentionally be 
 
 ## Accomplishments that we're proud of
 
+The graphics are 100% original! We thought they turned out pretty well and we hope you do too.
+
 ## What we learned
+
+That clean is top; our biggest time losses were due to hacky, undocumented messes lol
 
 ## What's next for Net Bet!
 

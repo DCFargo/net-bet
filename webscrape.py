@@ -8,7 +8,7 @@ class Scraper:
         self.game_url = 'https://plaintextsports.com/nba/' + date + '/' + teams
         self.teams = teams.upper()
         #Gets page from url, gets the text, then makes a Beautiful soup object with it for parsing
-        self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text, features="lxml")
+        self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text)
         
         #Gets the elements from the page, then make self.team1site and team2site from them
         
@@ -21,11 +21,11 @@ class Scraper:
 
         self.team1_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[0].a['href']
         self.team2_url = "https://plaintextsports.com" + self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[-1].a['href']
-        self.team1_site = bs4.BeautifulSoup(requests.get(self.team1_url).text, features='lxml')
-        #team1_site = bs4.BeautifulSoup(requests.get(team1_url).text, features='lxml')
+        self.team1_site = bs4.BeautifulSoup(requests.get(self.team1_url).text)
+        #team1_site = bs4.BeautifulSoup(requests.get(team1_url).text)
         #team1_url = "https://plaintextsports.com" + game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > b')[0].a['href']
 
-        self.team2_site = bs4.BeautifulSoup(requests.get(self.team2_url).text, features='lxml')
+        self.team2_site = bs4.BeautifulSoup(requests.get(self.team2_url).text)
         self.get_player_array()
         self.create_player_impact_list()
         self.get_team_record()

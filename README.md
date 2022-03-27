@@ -1,5 +1,14 @@
 # net-bet
 
+## How to Install
+
+Make sure Python 3.10 or later is installed (with pip!)
+
+The following dependencies are required from pip:
+- curses
+- webscrape
+- bs4
+
 ## Inspiration
 
 We saw the sports theme and talked about animating a sports game. The idea was then brought up (after one of us saw cards or something) to make it an interactive(ish) game with betting, and then NET BET was born!

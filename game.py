@@ -20,7 +20,8 @@ class Game:
             curses_usage.update_anim_window(self.animwin, parse_anim_from_str(plays[i + 1]), teams, plays[i])
             curses_usage.update_play_window(self.infowin, plays[i], plays[i + 1], "Play " + str(i/3 + 1) + "/" + str(len(plays)/3))
             self.stdscr.refresh()
-            self.stdscr.getch()
+            while self.stdscr.getch() != ord(' '):
+                pass
             
         #no you have so much to live for
         self.__del__()
@@ -71,8 +72,8 @@ class Player:
                     else:
                         winner_score = final_score[1]
                         loser_score = final_score[0]
-                    pe_winning = percent_error(winner_score, bet[2][0])
-                    pe_losing = percent_error(loser_score, bet[2][1])
+                    pe_winning = percent_error(winner_score, bet[1][0])
+                    pe_losing = percent_error(loser_score, bet[1][1])
                     
                     # Logistic growth model ( 100 - pe ) -> multiplier
                     # f(0) = 0.25
@@ -84,11 +85,11 @@ class Player:
                     self.results.append((3, True, bet[2] * win_multiplier / 2 + bet[2] * loss_multiplier / 2))
                     
                 case 4:
-                    pe = percent_error(lead_changes, bet[2])
+                    pe = percent_error(lead_changes, bet[1])
                     multiplier = 25 / (1 + math.e ** ((pe * (1 / 12)) - 4))
                     self.results.append((4, True, bet[2] * multiplier))
                 case 5:
-                    pe = percent_error(lead_changes, bet[2])
+                    pe = percent_error(lead_changes, bet[1])
                     multiplier = 25 / (1 + math.e ** ((pe * (1 / 12)) - 4))
                     self.results.append((4, True, bet[2] * multiplier))
                 case 6:

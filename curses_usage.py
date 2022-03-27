@@ -33,7 +33,7 @@ def update_play_window(win, score, text, playtext):
   for i in range(5):
     win.addstr(i, 0, "|")
     #win.addstr(i, 79, "|")
-  win.addstr(0, 6, "| play information | press key to advance |")
+  win.addstr(0, 6, "| play information | press space to advance |")
   win.addstr(1, 3, score)
   #adds the string to the w indo w
   win.addstr(2, 3, text)

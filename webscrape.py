@@ -28,6 +28,7 @@ class Scraper:
         self.team2_site = bs4.BeautifulSoup(requests.get(self.team2_url).text, features='lxml')
         self.get_player_array()
         self.create_player_impact_list()
+        self.get_team_record()
         self.get_dumb_box_score_info()
         self.get_plays()
         #REMEMBER TO RETURN STRINGS
@@ -53,10 +54,10 @@ class Scraper:
     def get_winner(self):
         
         if self.score1 > self.score2:
-            return self.teams[0:3]
+            self.winner = self.teams[0:3]
         if self.score2 > self.score1:
-            return self.teams[4:7]
-        return "TIE"
+            self.winner = self.teams[4:7]
+        return self.winner
             
     
     def get_final_score(self):
@@ -116,9 +117,8 @@ class Scraper:
             if tag.has_attr('href'):
                 return "https://plaintextsports.com" + tag['href'] == self.game_url
             return False
-
+       
         self.teams_record: list[tuple[int, int]] = []
-
         attempt = self.team1_site.find(is_our_game)
         dub_or_l = attempt.span.getText() # "W" or "L"
         #extract attempt's life span
@@ -131,6 +131,7 @@ class Scraper:
         else:
             win_loss_record[1] -= 1
         self.teams_record.append(win_loss_record)
+        
         attempt2 = self.team2_site.find(is_our_game)
         dub_or_l = attempt2.span.getText()
         attempt2.span.extract()

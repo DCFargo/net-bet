@@ -95,10 +95,7 @@ while cont:
   # Show users hint info
 
   print("\n" + "-" * 80)
-  scraper.get_team_record()
-  print("Team 1 win loss ratio:", scraper.team_record[0])
-  print("Team 2 win loss ratio:", scraper.team_record[1])
-
+  
   # Player bets
   for i in range(len(players)):
     while True:
@@ -250,7 +247,7 @@ while cont:
   for i, player in enumerate(players):
     player.calc_results(winner, scraper.win_loss_ratio, scraper.get_mvp(), scraper.get_lvp(), final_score, scraper.lead_changes, scraper.times_tied, scraper.biggest_biggest_lead)
     player.update_balance()
-    print("Player {} has ${} remaining. ", i, player.balance)
+    print("Player {} has ${} remaining. ".format(i+1, player.balance))
     if player.balance > starting_money:
       print("They made money! Congratulations!\n")
     else:

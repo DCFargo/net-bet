@@ -18,7 +18,7 @@ class Game:
         
         for i in range(0, len(plays), 3):
             curses_usage.update_anim_window(self.animwin, parse_anim_from_str(plays[i + 1]), teams, plays[i])
-            curses_usage.update_play_window(self.infowin, plays[i], plays[i + 1], "Play " + str(i/3 + 1) + "/" + str(len(plays)/3))
+            curses_usage.update_play_window(self.infowin, plays[i], plays[i + 1], "Play " + str(int(i/3 + 1)) + "/" + str(int(len(plays)/3)))
             self.stdscr.refresh()
             while self.stdscr.getch() != ord(' '):
                 pass

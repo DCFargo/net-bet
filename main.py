@@ -1,20 +1,21 @@
 from multiprocessing.sharedctypes import Value
 import game
-import curses_usage
+import curses_usage, curses
 from webscrape import Scraper
 from curses import wrapper
 
 # Preplay code begins
 # Make players
-
-print("Welcome to basket-watch [v0.1.0]!\n")
+print("All data courtesy of plaintextsports.com, thanks! :)\n")
+print("Welcome to Net Bet!!\n")
 while True:
   try:
     num_players = int(input("How many players are playing? (number): "))
     break
   except ValueError:
     print("Please enter a number.")
-    
+
+#coding stuff
 while True:
   try:
     starting_money = int(input('Please enter a whole number amount of money to start with: '))
@@ -27,7 +28,8 @@ while True:
 players = []
 for i in range(num_players):
   players.append(game.Player(starting_money))  
-while True:
+cont = True
+while cont:
   # Select date
   print("\n")
   while True:
@@ -49,6 +51,7 @@ while True:
       except ValueError:
         print("Please enter a valid month. (MM)")
 
+    #loop
     while True:
       try:
         day = int(input("Day (DD): "))
@@ -77,7 +80,7 @@ while True:
   while True:
     try:
       team_index = int(input("Enter team index (number): "))
-      if team_index >= 0 and team_index < len(team_array):
+      if team_index >= 0 and team_index <= len(team_array):
         break
       print("Please enter a valid team index. 1-" + str(len(team_array)))
     except ValueError:
@@ -92,7 +95,9 @@ while True:
   # Show users hint info
 
   print("\n" + "-" * 80)
-  print(scraper.get_team_record())
+  scraper.get_team_record()
+  print("Team 1 win loss ratio:", scraper.team_record[0])
+  print("Team 2 win loss ratio:", scraper.team_record[1])
 
   # Player bets
   for i in range(len(players)):
@@ -101,8 +106,6 @@ while True:
       print("These are the betting categories:")
       for j in range(len(game.Player.category)):
         print(str(j + 1) + ": " + game.Player.category[j])
-      print(str(len(game.Player.category) + 1) + ": Done betting")
-      print(str(len(game.Player.category) + 2) + ": Quit")
       print("\n")
       while True:
         try:
@@ -120,6 +123,7 @@ while True:
             print(str(team + 1) + ": " + scraper.get_team_arr_from_teams()[team])
           while True:
             try:
+              #make variable
               bet_prediction = int(input("Enter prediction (number): ")) - 1
               if bet_prediction >= 0 and bet_prediction < len(scraper.get_team_arr_from_teams()):
                 break
@@ -134,6 +138,7 @@ while True:
             print(str(k) + ": " + player) 
             k += 1
           print("\n")
+          #loop
           while True:
             try:
               bet_prediction = int(input("Enter prediction (number): ")) - 1
@@ -145,6 +150,7 @@ while True:
           
         case 2: #lvp
           print("Selected LVP category.")
+          #k is 1
           k = 1
           for player in scraper.players:
             print(str(k) + ": " + player) 
@@ -165,6 +171,7 @@ while True:
               winner_score = int(input("Enter winner score prediction (number): "))
               break
             except ValueError:
+              #reprimand user for their stupidity
               print("Please enter a number.")
           while True:
             try:
@@ -202,7 +209,7 @@ while True:
             except ValueError:
               print("Please enter a number.")
         case 7:
-          break
+          break #our sanity
         case 8:
           exit()
       # how much to bet
@@ -216,9 +223,9 @@ while True:
             # check for valid money bet, and only 2 decimal places
             if bet_amount > players[i].balance or bet_amount <= 0 or int(bet_amount * 100) != bet_amount * 100:
               print("You can't bet money you don't have.")
-              bet_amount = input("Please enter a valid number: ")
               continue
             else:
+              #forcefully remove the human's money
               players[i].balance -= bet_amount
               break
           except ValueError:
@@ -232,12 +239,25 @@ while True:
   #wrapper(main)
 
   # HACK: text print version for debug
+ 
+  print("Heads up, please resize your terminal to be > 80x24 if you haven't already!") 
+  input("Press enter to continue...")
+  init = game.Game(scraper.plays, scraper.teams)
+  final_score = scraper.get_final_score()
+  winner = scraper.get_winner()
+  print("Winner is.... " + Scraper.get_full_name(winner) + "!\n\n")
 
-  for play in scraper.plays:
-    print(play)
+  for i, player in enumerate(players):
+    player.calc_results(winner, scraper.win_loss_ratio, scraper.get_mvp(), scraper.get_lvp(), final_score, scraper.lead_changes, scraper.times_tied, scraper.biggest_biggest_lead)
+    player.update_balance()
+    print("Player {} has ${} remaining. ", i, player.balance)
+    if player.balance > starting_money:
+      print("They made money! Congratulations!\n")
+    else:
+      print("They unfortunately didn't make money... Maybe next time!\n")
+   
+  cont = input("Continue? (y/n): ").lower() == 'y'
+  if cont:
+    print("Starting next game.\n\n\n")
 
-  # Calc results
-
-  #for player in players:
-    #player.calc_results()
-    #player.update_balance()
+print('Thanks for playing Net Bet!')

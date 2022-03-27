@@ -10,7 +10,6 @@ class Scraper:
         #Gets page from url, gets the text, then makes a Beautiful soup object with it for parsing
         self.game_site = bs4.BeautifulSoup(requests.get(self.game_url).text, features="lxml")
         
-
         #Gets the elements from the page, then make self.team1site and team2site from them
         
         elems = self.game_site.select('.text-fg')
@@ -28,7 +27,8 @@ class Scraper:
 
         self.team2_site = bs4.BeautifulSoup(requests.get(self.team2_url).text, features='lxml')
         self.get_player_array()
-        
+        self.create_player_impact_list()
+        self.get_dumb_box_score_info()
         self.get_plays()
         #REMEMBER TO RETURN STRINGS
         #self.create_player_impact_list(self)
@@ -42,6 +42,7 @@ class Scraper:
                 counter += 1
             elif counter == 2:
                 formatted.append(val.getText()[:-2])
+                # increase counter
                 counter += 1
             else:
                 formatted.append(val.getText().split(" ")[-1])
@@ -57,17 +58,19 @@ class Scraper:
             return self.teams[4:7]
         return "TIE"
             
+    
     def get_final_score(self):
         #
         final_score = self.game_site.select('.flex.justify-between > div.flex.flex-1.flex-col.items-center > span')[1].parent
         final_score.span.extract()
-        final_score = final_score.getText().split(' - ')
+        
+        final_score = final_score.get_text().split(' - ')
         self.score1 = final_score[0]
         self.score2 = final_score[1]
         return final_score
         # [score1, score2]
     
-    
+    #callout to static method
     @staticmethod
     def clean_player_string(player_string):
         valid = re.compile(r"\s?[\+|\-]?[0-9]+")
@@ -94,6 +97,7 @@ class Scraper:
                 self.player_impact_list.remove(x)
         
     def get_mvp(self):
+        #it is z e r ooo
         h_pos = 0
         for x in range(1, len(self.player_impact_list)):
             if(self.player_impact_list>self.player_impact_list[h_pos]):
@@ -117,8 +121,10 @@ class Scraper:
 
         attempt = self.team1_site.find(is_our_game)
         dub_or_l = attempt.span.getText() # "W" or "L"
+        #extract attempt's life span
         attempt.span.extract()
-        win_loss_record: list[int] = attempt.next_sibling.strip().split('-')
+        win_loss_record: list[int] = attempt.next_sibling.strip().split('\n')[0].split('-')
+        #print('team1 win record', len(win_loss_record))
         win_loss_record = [int(win_loss) for win_loss in win_loss_record]
         if (dub_or_l.upper() == 'W'):
             win_loss_record[0] -= 1
@@ -128,14 +134,18 @@ class Scraper:
         attempt2 = self.team2_site.find(is_our_game)
         dub_or_l = attempt2.span.getText()
         attempt2.span.extract()
-        win_loss_record: list[int, int] = attempt.next_sibling.strip().split('-')
+        win_loss_record: list[int, int] = attempt.next_sibling.strip().split('\n')[0].split('-')
         win_loss_record = [int(win_loss) for win_loss in win_loss_record]
         if (dub_or_l.upper() == 'W'):
             win_loss_record[0] -= 1
         else:
             win_loss_record[1] -= 1
         self.teams_record.append(win_loss_record)
-        
+        # teams_record = [ [team1 wins, team1 loss], [team2 wins, team2 loss] ]
+        self.win_loss_ratio: float = (self.teams_record[0][0] / self.teams_record[0][1] ) / ( self.teams_record[1][0] / self.teams_record[1][1] ) # basically =(win1/loss1)/(win2/loss2)
+
+
+        return self.teams_record
 
 
 
@@ -152,10 +162,15 @@ class Scraper:
         self.times_tied = times_tied.getText()
         # then the biggest lead pain
         biggest_lead = self.game_site.find_all('b', string='Biggest Lead: ')[0].parent
+        
+        #extract the b from biggest
         biggest_lead.b.extract()
         lead_list = biggest_lead.getText().split(", ")  # [ 'team: num', 'team: num' ]
         lead_list = [string.split(": ") for string in lead_list]    # [ [team, num], [team, num]  ]
         self.biggest_lead = {listed[0]:listed[1] for listed in lead_list}   # {team:num, team:num}
+        self.biggest_biggest_lead = max(self.biggest_lead.values())
+        
+    #shoutout to static method
     @staticmethod
     def teams_on_day(date):
         teams = []
@@ -166,6 +181,7 @@ class Scraper:
             teams.append(text[len(text) - 7::])
         return teams
     
+    #callout to static method
     @staticmethod
     def get_full_name(team):
         match team.upper():
